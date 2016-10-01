@@ -16,6 +16,8 @@
     var canvas = document.getElementById(element);
     var ctx = canvas.getContext("2d");
     ctx.clearRect(0,0,width,height);
+    
+    var textscale = Math.round(width * 0.01);
 
     var bwidth = width/(stacks.length);
     if (bwidth>100) bwidth = 100;
@@ -24,7 +26,7 @@
     var top = 0;
     for (var i in stacks) if (top<stacks[i]['height']) top = stacks[i]['height'];
     //top =176;
-    var scale = (height-80) / top;
+    var scale = (height-90) / top;
 
     //$('.stacktotal').popover('destroy');
     $('.stacktotal').remove();
@@ -32,7 +34,7 @@
     var mov; var x = 5;
     for (var i in stacks)
     {
-      mov = height-60;
+      mov = height-80;
 
       var textwidth = (""+stacks[i]['name']).length*8.0;
       //if (textwidth<(bwidth-10)) draw_text(ctx,x+(bwidth-10)/2,mov,stacks[i]['name']);
@@ -44,12 +46,12 @@
       $('<a class="stacktotal" stackid='+stacks[i]['name']+' data-placement="bottom">'+stacks[i]['name']+'<br>'+(stacks[i]['height']-stacks[i]['saving']).toFixed(0)+' '+units+'</a>').css({
 	      position: "absolute",
         width: bwidth-16,
-	      top: mov+10,
+	      top: height,
 	      left: x,
 	      padding: "2px",
         "text-align":'center',
-        "font-size":"12px",
-        "line-height":'20px'
+        "font-size":textscale+"px",
+        "line-height":(textscale*1.5)+'px'
      	}).appendTo("#can_bound");
 
       if (stacks[i].context) {  // Complete hack!
@@ -75,7 +77,7 @@
       for (var b in stack)
       {
         var block = stack[b];
-        mov = draw_block(ctx,x,mov,block['kwhd'],block['name'],block['color'],scale," "+units,bwidth-10);
+        mov = draw_block(ctx,x,mov,block['kwhd'],block['name'],block['color'],scale," "+units,bwidth-10,textscale);
       }
       x += bwidth;
     }
@@ -95,7 +97,7 @@ function draw_text(ctx,x,mov,text)
 //--------------------------------------------------------------------------------------------------
 // Draw stack block
 //--------------------------------------------------------------------------------------------------
-function draw_block(ctx,x,mov,kwh,text,c,scale,unit,width)
+function draw_block(ctx,x,mov,kwh,text,c,scale,unit,width,textscale)
 {
   var fill,border;
 
@@ -125,11 +127,11 @@ function draw_block(ctx,x,mov,kwh,text,c,scale,unit,width)
     // Draw text if block height is more than 30 pixels
     if (seg>30.0)
     {
-      ctx.font = "bold 12px arial";
+      ctx.font = "bold "+textscale+"px arial";
       var textwidth = text.length*4.0;
       if (textwidth<width) ctx.fillText(text, x+(width/2),mov+(seg/2)-8+2);
 
-      ctx.font = "normal 12px arial"; 
+      ctx.font = "normal "+textscale+"px arial"; 
       var textwidth = (""+(kwh).toFixed(0)+unit).length*6.0;
       if (textwidth<width) {
         ctx.fillText((kwh).toFixed(0)+unit, x+(width/2),mov+(seg/2)+8+2);   

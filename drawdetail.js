@@ -1,17 +1,23 @@
 function drawdetail()
 {
+    var spaceheating = 0;
+    var spaceheatingfinal = 0;
+    
     var out = "";
     for (z in data)
     {
         out += "<h3>"+data[z].name+"</h3>";
-        out += "<p><b>Occupancy:</b> "+data[z].occupancy+", <b>Floor area:</b> "+data[z].floorarea+"m2</p><br>";
-        
+        out += "<hr>";
+        out += "<p><b>Occupancy:</b> "+data[z].occupancy+", <b>Floor area:</b> "+data[z].floorarea+"m2</p>";
+        out += "<p><b>Green Electric: </b>"+data[z].greenelectric+"</p>";
         out += "<p><b>Total kWh/d:</b> "+Math.round(data[z].totalkwhd)+", <b>Total CO2:</b> "+Math.round(data[z].totalco2)+" kgCO2</p>";
         out += "<p><b>Total kWh/d/pp:</b> "+Math.round(data[z].totalkwhd/data[z].occupancy)+", <b>Total CO2:</b> "+Math.round(data[z].totalco2/data[z].occupancy)+" kgCO2 per person</p>";
         out += "<p><b>Non transport primary energy:</b> "+Math.round(data[z].primaryenergyhouse*365/data[z].floorarea)+" kWh/m2 (Passivhaus & Carbon Coop retrofit target: 120 kWh/m2)</p>";
         out += "<p><b>Non transport emissions rate:</b> "+Math.round(data[z].house_co2/data[z].floorarea)+" kgCO2e/m2  (Carbon Coop: 17 kgCO2e/m2)</p>";
-        out += "<p><b>Space heating demand:</b> "+Math.round(data[z].spaceheating*365/data[z].floorarea)+" kWh/m2  (Passivhaus: 15 kWh/m2)</p><br>";
-        
+        out += "<p><b>Space heating fuel demand:</b> "+Math.round(data[z].spaceheating*365)+" kWh, "+Math.round(data[z].spaceheating*365/data[z].floorarea)+" kWh/m2</p>";
+        out += "<p><b>Space heating final demand:</b> "+Math.round(data[z].spaceheatingfinal*365)+" kWh, "+Math.round(data[z].spaceheatingfinal*365/data[z].floorarea)+" kWh/m2  (Passivhaus: 15 kWh/m2)</p>";
+        spaceheating += data[z].spaceheating*365;
+        spaceheatingfinal += data[z].spaceheatingfinal*365;
         
         out += "<p>"+data[z].description+"</p>";
         
@@ -40,6 +46,9 @@ function drawdetail()
         }
         out += "</table>";
     }
+    
+    console.log("total space heating fuel demand: "+spaceheating);
+    console.log("total space heating final demand: "+spaceheatingfinal);
     
     return out;
 }

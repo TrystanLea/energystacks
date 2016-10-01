@@ -7,22 +7,12 @@ function measures()
         var carmiles = 0;
         for (i in data[z].energydata)
         {
-            if (input.action_greenelectric || input.action_nationalgreenelectric)
-            {
-                if (i=="Non Green Electric") {
-                    data[z].energydata["100% Green Electric"] = data[z].energydata[i];
-                    delete data[z].energydata[i];
-                }
-                
-                if (i=="Non Green Electric Storage Heaters") {
-                    data[z].energydata["100% Green Electric Storage Heaters"] = data[z].energydata[i];
-                    delete data[z].energydata[i];
-                }
-                
-                if (i=="Non Green Electric Heatpump") {
-                    data[z].energydata["100% Green Electric Heatpump"] = data[z].energydata[i];
-                    delete data[z].energydata[i];
-                }
+            if (input['electricity-intensity-2010'] || input['electricity-intensity-2015']) {
+                data[z].greenelectric = 0;
+            }         
+            
+            if (input.action_greenelectric || input.action_nationalgreenelectric) {
+                data[z].greenelectric = 1;
             }
             
             if (input.action_gascooking)
@@ -30,7 +20,7 @@ function measures()
                 if (i=="Bottled Gas Cooking") {
                     
                     var outputrequirement = ((data[z].energydata[i].kg * 13.9) * data[z].energydata[i].efficiency/100);
-                    data[z].energydata["100% Green Electric Cooking"] = {kwh:outputrequirement};
+                    data[z].energydata["Electric Cooking"] = {kwh:outputrequirement};
                     delete data[z].energydata[i];
                 }
             }
@@ -40,7 +30,7 @@ function measures()
                 if (i=="Oil") {
                     var outputrequirement = ((data[z].energydata[i].l * 10.27) * data[z].energydata[i].efficiency/100);
                     var heatpumpinput = outputrequirement / 3.0;
-                    data[z].energydata["100% Green Electric Heatpump"] = {kwh:heatpumpinput, cop:3.0};
+                    data[z].energydata["Heatpump"] = {kwh:heatpumpinput, cop:3.0};
                     delete data[z].energydata[i];
                     
                     heatpumps_installed += 1;
@@ -50,7 +40,7 @@ function measures()
                     
                     var outputrequirement = ((data[z].energydata[i].kg * 13.9) * data[z].energydata[i].efficiency/100);
                     var heatpumpinput = outputrequirement / 3.0;
-                    data[z].energydata["100% Green Electric Heatpump"] = {kwh:heatpumpinput, cop:3.0};  
+                    data[z].energydata["Heatpump"] = {kwh:heatpumpinput, cop:3.0};  
                     heatpumps_installed += 1;
                     
                     delete data[z].energydata[i];
@@ -59,7 +49,7 @@ function measures()
                 if (i=="LPG") {
                     var outputrequirement = ((data[z].energydata[i].l * 11.0) * data[z].energydata[i].efficiency/100);
                     var heatpumpinput = outputrequirement / 3.0;
-                    data[z].energydata["100% Green Electric Heatpump"] = {kwh:heatpumpinput, cop:3.0};
+                    data[z].energydata["Heatpump"] = {kwh:heatpumpinput, cop:3.0};
                     delete data[z].energydata[i];
                     
                     heatpumps_installed += 1;
@@ -68,7 +58,7 @@ function measures()
                 if (i=="Coal") {
                     //var outputrequirement = ((data[z].energydata[i].kg * 8.0) * data[z].energydata[i].efficiency/100);
                     //var heatpumpinput = outputrequirement / 3.0;
-                    //data[z].energydata["100% Green Electric Heatpump"] = {kwh:heatpumpinput, cop:3.0};
+                    //data[z].energydata["100% Green Heatpump"] = {kwh:heatpumpinput, cop:3.0};
                     delete data[z].energydata[i];
                 }
             }
@@ -93,7 +83,7 @@ function measures()
             }
            
             if (i=="Bus" && input.action_greenbuses) {
-                data[z].energydata["100% Green Electric Bus"] = data[z].energydata[i];
+                data[z].energydata["Electric Bus"] = data[z].energydata[i];
                 delete data[z].energydata[i];
             }
             
@@ -107,10 +97,10 @@ function measures()
         
         if (input.action_retrofit)
         {
-            if (data[z].energydata["100% Green Electric"]!=undefined) available -= data[z].energydata["100% Green Electric"].kwh;
-            if (data[z].energydata["Non Green Electric"]!=undefined) available -= data[z].energydata["Non Green Electric"].kwh;
+            if (data[z].energydata["Electric"]!=undefined) available -= data[z].energydata["Electric"].kwh;
+            if (data[z].energydata["Electric"]!=undefined) available -= data[z].energydata["Electric"].kwh;
             if (data[z].energydata["Bottled Gas Cooking"]!=undefined) available -= data[z].energydata["Bottled Gas Cooking"].kg * 13.9;
-            if (data[z].energydata["100% Green Electric Cooking"]!=undefined) available -= data[z].energydata["100% Green Electric Cooking"].kwh;
+            if (data[z].energydata["Electric Cooking"]!=undefined) available -= data[z].energydata["Electric Cooking"].kwh;
             
             if (available>0)
             {
@@ -123,10 +113,8 @@ function measures()
                 if (data[z].energydata["LPG"]!=undefined) total += data[z].energydata["LPG"].l * 11.0;
                 if (data[z].energydata["Wood Logs"]!=undefined) total += data[z].energydata["Wood Logs"].m3 * 1380;
                 if (data[z].energydata["Wood Pellets"]!=undefined) total += data[z].energydata["Wood Pellets"].m3 * 4800;
-                if (data[z].energydata["Non Green Electric Storage Heaters"]!=undefined) total += data[z].energydata["Non Green Electric Storage Heaters"].kwh;
-                if (data[z].energydata["100% Green Electric Storage Heaters"]!=undefined) total += data[z].energydata["100% Green Electric Storage Heaters"].kwh;
-                if (data[z].energydata["Non Green Electric Heatpump"]!=undefined) total += data[z].energydata["Non Green Electric Heatpump"].kwh*data[z].energydata["100% Green Electric Heatpump"].cop;
-                if (data[z].energydata["100% Green Electric Heatpump"]!=undefined) total += data[z].energydata["100% Green Electric Heatpump"].kwh*data[z].energydata["100% Green Electric Heatpump"].cop;
+                if (data[z].energydata["Storage Heaters"]!=undefined) total += data[z].energydata["Storage Heaters"].kwh;
+                if (data[z].energydata["Heatpump"]!=undefined) total += data[z].energydata["Heatpump"].kwh*data[z].energydata["Heatpump"].cop;
                
                 
                 if (total>available)
@@ -140,23 +128,21 @@ function measures()
                     if (data[z].energydata["Wood Logs"]!=undefined) data[z].energydata["Wood Logs"].m3 = (((data[z].energydata["Wood Logs"].m3 * 1380)/total) * available) / 1380;
                     if (data[z].energydata["Wood Pellets"]!=undefined) data[z].energydata["Wood Pellets"].m3 = (((data[z].energydata["Wood Pellets"].m3 * 4800)/total) * available) / 4800;
                     
-                    if (data[z].energydata["Non Green Electric Storage Heaters"]!=undefined) data[z].energydata["Non Green Electric Storage Heaters"].kwh = ((data[z].energydata["Non Green Electric Storage Heaters"].kwh/total) * available);
-                    if (data[z].energydata["100% Green Electric Storage Heaters"]!=undefined) data[z].energydata["100% Green Electric Storage Heaters"].kwh = ((data[z].energydata["100% Green Electric Storage Heaters"].kwh/total) * available);
+                    if (data[z].energydata["Storage Heaters"]!=undefined) data[z].energydata["Storage Heaters"].kwh = ((data[z].energydata["Storage Heaters"].kwh/total) * available);
                     
-                    if (data[z].energydata["Non Green Electric Heatpump"]!=undefined) data[z].energydata["Non Green Electric Heatpump"].kwh = (((data[z].energydata["Non Green Electric Heatpump"].kwh*data[z].energydata["Non Green Electric Heatpump"].cop)/total) * available)/data[z].energydata["100% Green Electric Heatpump"].cop;
-                    if (data[z].energydata["100% Green Electric Heatpump"]!=undefined) data[z].energydata["100% Green Electric Heatpump"].kwh = (((data[z].energydata["100% Green Electric Heatpump"].kwh*data[z].energydata["100% Green Electric Heatpump"].cop)/total) * available)/data[z].energydata["100% Green Electric Heatpump"].cop;
+                    if (data[z].energydata["Heatpump"]!=undefined) data[z].energydata["Heatpump"].kwh = (((data[z].energydata["Heatpump"].kwh*data[z].energydata["Heatpump"].cop)/total) * available)/data[z].energydata["Heatpump"].cop;
                 }
             }
         }
         
         
         if (input.action_greentrains && data[z].energydata["Train"]!=undefined) {
-            data[z].energydata["100% Green Electric Train"] = data[z].energydata["Train"];
+            data[z].energydata["Electric Train"] = data[z].energydata["Train"];
             delete data[z].energydata["Train"];
         }
         
         if (carmiles>0) {
-            data[z].energydata["100% Green Electric Car"] = {kwh:carmiles/4.0};
+            data[z].energydata["Electric Car"] = {kwh:carmiles/3.8};
             electric_cars_bought += 1;
         }
     }
